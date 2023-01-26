@@ -64,39 +64,33 @@ export async function getBirdScooter(url = birdScooterURL) {
     hour12: true,
   });
 
-  //Error handling utilizing backup API in case first does not fetch data
-  //Short Term Order
   try {
-    // birdAPI = false;
-    // birdResponse = await fetch(`/cors?url=${encodeURIComponent(url)}`);
-    // birdData = await birdResponse.json();
-    // birdScooterArr = birdData.data.bikes;
-
+    console.log('Trying call');
+    birdAPI = true;
+    const authResponse = await fetch(`/auth`);
+    console.log('Auth response: ');
+    console.log(authResponse);
+    const accessToken = await authResponse.json();
+    console.log('Access Token:');
+    console.log(accessToken);
+    birdResponse = await fetch(
+      `/bird?auth=${encodeURIComponent(accessToken)}`
+    );
+    birdData = await birdResponse.json();
+    birdScooterArr = birdData.birds;
+  } catch {
+    console.log('failed');
+    loadingModal.style.display = "none";
+    // document.getElementById("birdFilter").className = "noFilter";
     birdAPI = true;
     birdData = birdSeedData;
     birdScooterArr = birdData.birds;
-  } catch {
-    try {
-      birdAPI = true;
-      const authResponse = await fetch(`/auth`);
-      const accessToken = await authResponse.json();
-      birdResponse = await fetch(
-        `/bird?auth=${encodeURIComponent(accessToken)}`
-      );
-      birdData = await birdResponse.json();
-      birdScooterArr = birdData.birds;
-    } catch {
-      // loadingModal.style.display = "none";
-      // document.getElementById("birdFilter").className = "noFilter";
-      birdAPI = true;
-      birdData = birdSeedData;
-      birdScooterArr = birdData.birds;
-      // birdData = alert(
-      //   "Apologies, the bird API originally utilized for this application has since deprecated.  In the mean time while I search for an alternative API, seed data will be provided for demonstration purposes. - JMS"
-      // );
-      // return null;
-    }
+    // birdData = alert(
+    //   "Apologies, the bird API originally utilized for this application has since deprecated.  In the mean time while I search for an alternative API, seed data will be provided for demonstration purposes. - JMS"
+    // );
+    return null;
   }
+  
 
   let numBikes = birdScooterArr.length;
   let availableBikes = 0;
